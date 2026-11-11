@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>SmartyHub Logistics</title>
+<style>
+:root{--bg:#f5f1fc;--card:#fff;--tx:#14082b;--mut:#6f6590;--br:#e4dcf3;--pri:#7b0dfd;--mid:#5800cd;--deep:#29015a;--ink:#09001c;--on:#fff;--food:#d9780a;--med:#d6336c;--re:#2f6fe0;--ok:#12a05c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#09001c;--card:#170a30;--tx:#f0eafc;--mut:#a597c9;--br:#2d1a52;--pri:#9a47ff;--food:#f0a050;--med:#ff7aa8;--re:#7ea8ff;--ok:#3dd68c}}
+:root[data-theme="dark"]{--bg:#09001c;--card:#170a30;--tx:#f0eafc;--mut:#a597c9;--br:#2d1a52;--pri:#9a47ff;--food:#f0a050;--med:#ff7aa8;--re:#7ea8ff;--ok:#3dd68c}
+*{box-sizing:border-box;margin:0}
+html,body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:84px}
+body.w{max-width:960px}
+button,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#fff;color:#29015a;border-bottom:3px solid var(--pri);position:sticky;top:env(safe-area-inset-top,0px);z-index:6}
+.brand{display:flex;align-items:center;gap:10px}.brand .hx{height:42px}.brand .wm{height:30px;max-width:46vw;object-fit:contain}
+.brand b{display:block;font-size:16px;letter-spacing:.5px}.brand b span{color:#b98bff}.brand small{font-size:10px;letter-spacing:4px;opacity:.8}
+.pill{display:flex;align-items:center;gap:7px;border:1px solid var(--br);padding:6px 12px;border-radius:99px;font-weight:600;font-size:12px;color:var(--tx)}header .pill{color:#29015a;border-color:#d9c9f5}
+.dot{width:9px;height:9px;border-radius:50%;background:#8a7fa8}.on .dot{background:#3dd68c}
+.wrap{padding:16px}h2{font-size:17px;margin:2px 0 12px}
+.sub{color:var(--mut);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:14px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;color:#fff;white-space:nowrap}
+.t-food{background:var(--food)}.t-med{background:var(--med)}.t-re{background:var(--re)}
+.fee{font-weight:800;font-size:17px;color:var(--pri)}
+.route{margin:10px 0;padding-left:14px;border-left:2px dashed var(--pri)}.route div{margin:4px 0}.route small{color:var(--mut);display:block}
+.note{background:var(--bg);border-radius:8px;padding:8px 10px;font-size:13px;margin-bottom:10px}
+.btn{background:linear-gradient(135deg,var(--pri),var(--mid));color:#fff;padding:12px;border-radius:10px;font-weight:700;width:100%;text-align:center;display:block;text-decoration:none;margin-top:6px}
+.btn.s{background:var(--bg);color:var(--tx);border:1px solid var(--br)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--br);background:var(--card);font-size:13px}.chip.a{background:var(--pri);color:#fff;border-color:var(--pri);font-weight:600}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:inherit;display:flex;background:var(--card);border-top:1px solid var(--br);padding-bottom:env(safe-area-inset-bottom,0px);z-index:9}
+body nav{max-width:520px}body.w nav{max-width:960px}
+nav button{flex:1;padding:10px 2px;font-size:12px;color:var(--mut);position:relative}nav button.a{color:var(--pri);font-weight:700}nav i{display:flex;justify-content:center;margin-bottom:2px}.seg button{display:flex;align-items:center;justify-content:center;gap:6px}
+.badge{position:absolute;top:4px;left:56%;background:var(--med);color:#fff;border-radius:99px;font-size:10px;padding:1px 6px}
+input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--br);background:var(--bg);color:var(--tx);margin:6px 0 10px}
+.big{font-size:30px;font-weight:800}.steps{display:flex;gap:6px;margin:10px 0}.steps span{flex:1;height:5px;border-radius:9px;background:var(--br)}.steps span.d{background:var(--pri)}
+.empty{text-align:center;color:var(--mut);padding:36px 10px;grid-column:1/-1}
+.toast{position:fixed;top:78px;left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:13px;z-index:20}
+.seg{display:flex;background:var(--card);border:1px solid var(--br);border-radius:12px;padding:4px;margin:18px 0}.seg button{flex:1;padding:9px;border-radius:9px;font-weight:600;color:var(--mut)}.seg button.a{background:var(--pri);color:#fff}
+.hero{text-align:center;background:#fff;margin:0 -16px;padding:24px 0 14px;border-bottom:3px solid var(--pri)}.hero img{width:min(280px,72%)}
+pre{background:var(--ink);color:#d9c5ff;padding:12px;border-radius:10px;font-size:12px;overflow-x:auto}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.kpi .big{font-size:22px}
+.st{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--br)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var IC={package:'<path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/>',bike:'<circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/>',truck:'<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>',shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',utensils:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',pill:'<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>',file:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',wallet:'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',list:'<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',plug:'<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',chart:'<line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/>',lock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',power:'<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/>',plus:'<path d="M5 12h14"/><path d="M12 5v14"/>'};
+function ic(n,s){s=s||18;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex:none">'+IC[n]+'</svg>'}
+function ci(k){return ic(ci(k),14)}
+var CAT={food:{n:"Food & Supplements",c:"t-food",ic:"utensils",src:"SmartyHub Organic"},med:{n:"Pharmacy",c:"t-med",ic:"pill",src:"HosiRx"},re:{n:"Real Estate Parcels",c:"t-re",ic:"file",src:"MainTown Realty"}};
+var ZONES=["Lekki Phase 1","Ikeja","Victoria Island","Yaba","Surulere"];
+var TPL=[
+["food","Lekki Phase 1","SmartyHub Organic Kitchen, Admiralty Way","12 Fola Osibo St, Lekki",3.2,1800,"Keep food hot. Pay on delivery: ₦9,500."],
+["med","Ikeja","HosiRx Partner Pharmacy, Allen Ave","7 Opebi Rd, Ikeja",4.1,2200,"Temperature-sensitive. Hand over to recipient only.","4821"],
+["re","Victoria Island","MainTown Realty Office, Adeola Odeku","Eko Atlantic Legal Chambers, VI",2.6,1500,"Signed tenancy documents. Get a signed receipt."],
+["food","Yaba","SmartyHub Organic Hub, Herbert Macaulay","UNILAG Gate, Akoka",5.4,2100,"Supplement pack, no refrigeration needed."],
+["med","Lekki Phase 1","HosiRx Partner Pharmacy, Lekki Phase 1","3 Admiralty Way, Lekki",1.8,1600,"Prescription meds. Check recipient ID.","7305"],
+["re","Ikeja","MainTown Realty Ikeja Desk","15 Awolowo Way, Ikeja",3.7,1900,"Keys and inspection pack for new tenant."],
+["food","Surulere","SmartyHub Organic Kitchen, Adeniran Ogunsanya","22 Bode Thomas St, Surulere",2.2,1400,"Meal prep boxes x4. Keep upright."],
+["med","Victoria Island","HosiRx Hospital Pharmacy, Ozumba Mbadiwe","Block C, Oniru Estate, VI",3.0,2000,"Urgent. Hospital discharge medication.","1198"]];
+var seq=1040;
+function mk(t){seq++;return{id:"SH-"+seq,cat:t[0],zone:t[1],from:t[2],to:t[3],km:t[4],fee:t[5],note:t[6],pin:t[7]||"",st:"open",fleet:null,rider:null}}
+var S={role:null,me:null,tab:"",lr:"rider",toast:"",
+fleets:[{id:"own",name:"SmartyHub Fleet",comm:0,cats:["food","med","re"],key:"shl_live_own_8f2a91"},{id:"swift",name:"SwiftMove Logistics",comm:15,cats:["food","re"],key:"shl_live_swf_c47d02"},{id:"kobo",name:"KoboRide Dispatch",comm:12,cats:["food","med"],key:"shl_live_kbr_19be77"}],
+riders:[{id:"r1",name:"Tunde Ade",phone:"0801 234 5678",fleet:"own",on:true,zones:["Lekki Phase 1","Ikeja","Victoria Island"],cats:["food","med","re"]},{id:"r2",name:"Chidi Obi",phone:"0802 345 6789",fleet:"swift",on:true,zones:ZONES.slice(),cats:["food","re"]},{id:"r3",name:"Sade Bello",phone:"0803 456 7890",fleet:"swift",on:false,zones:ZONES.slice(),cats:["food","re"]},{id:"r4",name:"Musa Ali",phone:"0805 567 8901",fleet:"kobo",on:true,zones:ZONES.slice(),cats:["food","med"]}],
+orders:TPL.map(mk)};
+function N(n){return "₦"+Math.round(n).toLocaleString("en-NG")}
+function fl(id){return S.fleets.find(function(f){return f.id===id})}
+function rd(id){return S.riders.find(function(r){return r.id===id})}
+function od(id){return S.orders.find(function(o){return o.id===id})}
+function toast(m){S.toast=m;R();setTimeout(function(){S.toast="";R()},1900)}
+function tog(a,v){var i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);R()}
+function go(t){S.tab=t;R()}
+function map(a){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a+", Lagos, Nigeria")}
+function login(){var r=S.lr;
+if(r==="admin"){S.role="admin";S.tab="orders"}
+else if(r==="fleet"){S.role="fleet";S.me=document.getElementById("fs").value;S.tab="pool"}
+else{var n=document.getElementById("n").value.trim(),p=document.getElementById("p").value.trim(),f=document.getElementById("fs").value;if(!n||!p)return toast("Enter your name and phone");var x=S.riders.find(function(q){return q.phone===p});if(!x){x={id:"r"+(S.riders.length+1),name:n,phone:p,fleet:f,on:true,zones:["Lekki Phase 1","Ikeja","Victoria Island"],cats:["food","med","re"]};S.riders.push(x)}S.role="rider";S.me=x.id;S.tab="feed"}
+R()}
+function out(){S.role=null;S.me=null;R()}
+function simulate(){var o=mk(TPL[Math.floor(Math.random()*TPL.length)]);S.orders.unshift(o);toast("Webhook received: "+o.id)}
+function assignFleet(id,f){var o=od(id);if(!f)return;o.fleet=f==="pool"?null:f;if(f==="pool")o.rider=null;toast(f==="pool"?"Released to open pool":"Assigned to "+fl(f).name)}
+function claim(id){od(id).fleet=S.me;toast("Claimed for your fleet")}
+function assignRider(id){var v=document.getElementById("as-"+id).value;if(!v)return toast("Pick a rider");var o=od(id);o.rider=v;o.st="assigned";toast("Assigned to "+rd(v).name)}
+function accept(id){var r=rd(S.me),o=od(id);o.rider=r.id;o.fleet=r.fleet;o.st="assigned";S.tab="active";toast("Order "+id+" accepted")}
+function adv(id){var o=od(id);if(o.st==="assigned"){o.st="picked";return R()}
+if(o.pin){var v=document.getElementById("pin-"+id).value.trim();if(v!==o.pin)return toast("Wrong delivery code")}
+o.st="delivered";toast("Delivered. Great work!")}
+function elig(o,f){return fl(f).cats.indexOf(o.cat)>-1}
+function ocard(o,mode){var c=CAT[o.cat],h='<div class="card"><div class="row"><span class="tag '+c.c+'">'+ic(c.ic,14)+" "+c.n+'</span><span class="fee">'+N(o.fee)+'</span></div><div class="sub" style="margin-top:6px">'+o.id+" · "+c.src+" · "+o.km+" km · "+o.zone+'</div><div class="route"><div><small>Pickup</small>'+o.from+'</div><div><small>Drop-off</small>'+o.to+'</div></div><div class="note">'+o.note+(o.pin?" "+ic("lock",13)+" Delivery code required.":"")+"</div>";
+if(mode==="accept")h+='<button class="btn" onclick="accept(\''+o.id+'\')">Accept delivery</button>';
+if(mode==="claim")h+='<button class="btn" onclick="claim(\''+o.id+'\')">Claim for fleet</button>';
+if(mode==="active"){h+='<div class="steps"><span class="d"></span><span class="'+(o.st==="picked"?"d":"")+'"></span><span></span></div><div class="sub">'+(o.st==="assigned"?"Heading to pickup":"Picked up, on the way")+"</div>";
+if(o.st==="picked"&&o.pin)h+='<input id="pin-'+o.id+'" inputmode="numeric" maxlength="4" placeholder="Customer’s 4-digit code">';
+h+='<button class="btn" onclick="adv(\''+o.id+'\')">'+(o.st==="assigned"?"Confirm pickup":"Mark delivered")+'</button><a class="btn s" target="_blank" rel="noopener" href="'+map(o.st==="assigned"?o.from:o.to)+'">Open in Maps</a>'}
+if(mode==="assign"){var f=fl(o.fleet);h+='<select id="as-'+o.id+'"><option value="">Assign to rider…</option>'+S.riders.filter(function(r){return r.fleet===f.id}).map(function(r){return '<option value="'+r.id+'">'+r.name+(r.on?"":" (offline)")+"</option>"}).join("")+'</select><button class="btn" onclick="assignRider(\''+o.id+'\')">Assign</button>'}
+if(mode==="admin"){h+='<div class="row" style="margin-bottom:6px"><span class="st">'+o.st.toUpperCase()+'</span><span class="sub">'+(o.fleet?fl(o.fleet).name:"Open pool")+(o.rider?" · "+rd(o.rider).name:"")+"</span></div>";
+if(o.st==="open"||o.st==="assigned"&&!o.rider){h+='<select onchange="assignFleet(\''+o.id+'\',this.value)"><option value="">Route to…</option><option value="pool">Open pool</option>'+S.fleets.filter(function(f){return elig(o,f.id)}).map(function(f){return '<option value="'+f.id+'">'+f.name+"</option>"}).join("")+"</select>"}}
+if(mode==="info")h+='<div class="sub">'+o.st.toUpperCase()+(o.rider?" · "+rd(o.rider).name:"")+"</div>";
+return h+"</div>"}
+function list(a,m,e){return '<div class="grid">'+(a.length?a.map(function(o){return ocard(o,m)}).join(""):'<div class="empty">'+e+"</div>")+"</div>"}
+function chips(arr,all,fn,lab){return '<div class="chips">'+all.map(function(k){return '<button class="chip '+(arr.indexOf(k)>-1?"a":"")+'" onclick="'+fn+"(\'"+k+"\')\">"+(lab?lab(k):k)+"</button>"}).join("")+"</div>"}
+function tz(k){var r=rd(S.me);tog(r.zones,k)}function tc(k){var r=rd(S.me);tog(r.cats,k)}
+function fc(k){var f=fl(S.me);tog(f.cats,k)}
+function rview(){var r=rd(S.me),f=fl(r.fleet),h="",
+feed=S.orders.filter(function(o){return o.st==="open"&&!o.rider&&(!o.fleet||o.fleet===r.fleet)&&elig(o,r.fleet)&&r.zones.indexOf(o.zone)>-1&&r.cats.indexOf(o.cat)>-1}),
+act=S.orders.filter(function(o){return o.rider===r.id&&(o.st==="assigned"||o.st==="picked")}),
+dn=S.orders.filter(function(o){return o.rider===r.id&&o.st==="delivered"});
+if(S.tab==="feed"){h+="<h2>Available deliveries</h2>"+(r.on?list(feed,"accept","No orders match your zones and categories.<br>Adjust them in Profile."):'<div class="empty">Go online to see new orders.</div>')}
+if(S.tab==="active")h+="<h2>Active deliveries</h2>"+list(act,"active","No active deliveries.");
+if(S.tab==="earn"){var g=dn.reduce(function(a,o){return a+o.fee},0);h+='<h2>Earnings</h2><div class="card"><div class="sub">Gross delivery fees</div><div class="big">'+N(g)+'</div><div class="sub">'+dn.length+" completed · fleet commission "+f.comm+"%</div></div><br><div class=\"card\"><div class=\"sub\">Net payout</div><div class=\"big\">"+N(g*(1-f.comm/100))+"</div></div>"}
+if(S.tab==="me")h+='<h2>Profile & preferences</h2><div class="card"><b>'+r.name+'</b><div class="sub">'+r.phone+" · "+f.name+'</div></div><br><div class="sub" style="margin-bottom:6px">Active zones</div>'+chips(r.zones,ZONES,"tz")+'<div class="sub" style="margin-bottom:6px">Order categories</div>'+chips(r.cats,f.cats,"tc",function(k){return ci(k)+" "+CAT[k].n})+'<button class="btn s" onclick="out()">Log out</button>';
+return h}
+function fview(){var f=fl(S.me),h="",
+pool=S.orders.filter(function(o){return o.st==="open"&&!o.fleet&&elig(o,f.id)}),
+mine=S.orders.filter(function(o){return o.fleet===f.id}),
+un=mine.filter(function(o){return o.st==="open"&&!o.rider}),
+rs=S.riders.filter(function(r){return r.fleet===f.id});
+if(S.tab==="pool")h+="<h2>Open pool</h2>"+list(pool,"claim","No open orders for your approved categories.");
+if(S.tab==="orders")h+="<h2>Needs a rider ("+un.length+")</h2>"+list(un,"assign","All claimed orders have riders.")+"<h2 style=\"margin-top:18px\">In progress & done</h2>"+list(mine.filter(function(o){return o.rider}),"info","Nothing yet.");
+if(S.tab==="riders")h+='<h2>Your riders</h2><div class="grid">'+rs.map(function(r){return '<div class="card row"><div><b>'+r.name+'</b><div class="sub">'+r.phone+'</div></div><span class="pill '+(r.on?"on":"")+'" style="color:var(--tx);border-color:var(--br)"><span class="dot"></span>'+(r.on?"Online":"Offline")+"</span></div>"}).join("")+'</div><br><div class="card"><b>Add rider</b><input id="rn" placeholder="Full name"><input id="rp" type="tel" placeholder="Phone"><button class="btn" onclick="addR()">Add rider</button></div>';
+if(S.tab==="api")h+='<h2>API & webhooks</h2><div class="card"><div class="sub">Your API key</div><b style="word-break:break-all">'+f.key+'</b><div class="sub" style="margin:12px 0 4px">Approved categories</div>'+f.cats.map(function(k){return ci(k)+" "+CAT[k].n}).join(", ")+'</div><br><pre>GET  /api/fleet/orders?zone=ikeja\nPOST /api/orders/{id}/claim\nPOST /api/orders/{id}/assign\n     {"rider_id":"r2"}\nPOST /api/orders/{id}/status\n     {"status":"picked","lat":6.45,"lng":3.47}\n\nWebhook to you: order.available\n{"order_id":"SH-1041","category":"food_supplement",\n "zone":"lekki","fee":1800}</pre><p class="sub" style="margin-top:8px">Demo only. Live endpoints arrive with the Supabase backend.</p>';
+return h}
+function addR(){var n=document.getElementById("rn").value.trim(),p=document.getElementById("rp").value.trim();if(!n||!p)return toast("Enter name and phone");S.riders.push({id:"r"+(S.riders.length+1),name:n,phone:p,fleet:S.me,on:true,zones:ZONES.slice(),cats:fl(S.me).cats.slice()});toast("Rider added")}
+function setC(id,v){fl(id).comm=Math.max(0,Math.min(50,+v||0));R()}
+function aview(){var h="",d=S.orders.filter(function(o){return o.st==="delivered"}),g=d.reduce(function(a,o){return a+o.fee},0),c=d.reduce(function(a,o){return a+o.fee*(fl(o.fleet).comm/100)},0);
+if(S.tab==="orders")h+='<div class="row"><h2>All orders ('+S.orders.length+')</h2><button class="pill" style="background:var(--pri);color:#fff;border:0" onclick="simulate()">'+ic("plus",14)+' Simulate order</button></div>'+list(S.orders,"admin","No orders.");
+if(S.tab==="fleets")h+='<h2>Fleets & approvals</h2><div class="grid">'+S.fleets.map(function(f){return '<div class="card"><b>'+f.name+'</b><div class="sub" style="margin:6px 0">Approved categories</div><div class="chips">'+["food","med","re"].map(function(k){return '<button class="chip '+(f.cats.indexOf(k)>-1?"a":"")+'" onclick="tog(fl(\''+f.id+"\').cats,\'"+k+"\')\">"+ci(k)+" "+CAT[k].n+"</button>"}).join("")+'</div><div class="sub">Commission %</div><input type="number" value="'+f.comm+'" onchange="setC(\''+f.id+'\',this.value)"><div class="sub">'+S.riders.filter(function(r){return r.fleet===f.id}).length+" riders · key "+f.key+"</div></div>"}).join("")+"</div>";
+if(S.tab==="stats"){var by={};d.forEach(function(o){by[o.cat]=(by[o.cat]||0)+o.fee});h+='<h2>Overview</h2><div class="kpi"><div class="card"><div class="sub">Orders</div><div class="big">'+S.orders.length+'</div></div><div class="card"><div class="sub">Delivered</div><div class="big">'+d.length+'</div></div><div class="card"><div class="sub">Gross fees</div><div class="big">'+N(g)+'</div></div><div class="card"><div class="sub">Hub commission</div><div class="big">'+N(c)+"</div></div></div>"+Object.keys(CAT).map(function(k){return '<div class="card row" style="margin-bottom:8px"><span>'+ci(k)+" "+CAT[k].n+"</span><b>"+N(by[k]||0)+"</b></div>"}).join("")+'<button class="btn s" onclick="out()">Log out</button>'}
+return h}
+function R(){var a=document.getElementById("app"),h="";document.body.className=S.role&&S.role!=="rider"?"w":"";
+if(!S.role){var r=S.lr;h+='<div class="wrap"><div class="hero"><img src="assets/logo.png" alt="SmartyHub Logistics"></div><div class="seg">'+["rider","fleet","admin"].map(function(k){return '<button class="'+(r===k?"a":"")+'" onclick="S.lr=\''+k+'\';R()">'+ic({rider:"bike",fleet:"truck",admin:"shield"}[k],17)+{rider:"Rider",fleet:"Fleet",admin:"Hub admin"}[k]+"</button>"}).join("")+"</div>";
+if(r==="rider")h+='<label class="sub">Full name</label><input id="n" placeholder="e.g. Tunde Ade"><label class="sub">Phone number</label><input id="p" type="tel" placeholder="080 0000 0000"><label class="sub">Your fleet</label>';
+if(r==="fleet")h+='<label class="sub">Select your logistics company</label>';
+if(r!=="admin")h+='<select id="fs">'+S.fleets.map(function(f){return '<option value="'+f.id+'">'+f.name+"</option>"}).join("")+"</select>";
+else h+='<p class="sub" style="margin-bottom:10px">Route incoming orders to fleets, approve categories and track commission.</p>';
+h+='<button class="btn" onclick="login()">Continue</button><p class="sub" style="margin-top:14px;text-align:center">Demo mode. Sample data, no real orders.</p></div>';a.innerHTML=h+(S.toast?'<div class="toast">'+S.toast+"</div>":"");return}
+var T,hd,body;
+if(S.role==="rider"){var rr=rd(S.me),n=S.orders.filter(function(o){return o.st==="open"&&!o.rider&&(!o.fleet||o.fleet===rr.fleet)&&elig(o,rr.fleet)&&rr.zones.indexOf(o.zone)>-1&&rr.cats.indexOf(o.cat)>-1}).length,ac=S.orders.filter(function(o){return o.rider===rr.id&&(o.st==="assigned"||o.st==="picked")}).length;
+T=[["feed","inbox","Feed",n],["active","bike","Active",ac],["earn","wallet","Earnings",0],["me","user","Profile",0]];hd='<button class="pill '+(rr.on?"on":"")+'" onclick="rd(S.me).on=!rd(S.me).on;R()"><span class="dot"></span>'+(rr.on?"Online":"Offline")+"</button>";body=rview()}
+else if(S.role==="fleet"){T=[["pool","inbox","Pool",0],["orders","list","Orders",0],["riders","users","Riders",0],["api","plug","API",0]];hd='<button class="pill" onclick="out()">'+fl(S.me).name+" "+ic("power",14)+"</button>";body=fview()}
+else{T=[["orders","list","Orders",0],["fleets","truck","Fleets",0],["stats","chart","Stats",0]];hd='<span class="pill">Hub admin</span>';body=aview()}
+h='<header><div class="brand"><img class="hx" src="assets/hex.png" alt=""><img class="wm" src="assets/wordmark.png" alt="SmartyHub Logistics"></div>'+hd+'</header><div class="wrap">'+body+"</div><nav>"+T.map(function(t){return '<button class="'+(S.tab===t[0]?"a":"")+'" onclick="go(\''+t[0]+'\')"><i>'+ic(t[1],22)+"</i>"+t[2]+(t[3]?'<span class="badge">'+t[3]+"</span>":"")+"</button>"}).join("")+"</nav>";
+a.innerHTML=h+(S.toast?'<div class="toast">'+S.toast+"</div>":"")}
+R();
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
+</script>
+</body>
+</html>
