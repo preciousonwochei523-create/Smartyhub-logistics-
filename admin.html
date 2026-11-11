@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#150a2b">
+<meta name="robots" content="noindex"><link rel="icon" href="assets/icon-192.png"><title>SmartyHub Admin</title>
+<style>
+:root{--bg:#f4f2f8;--card:#fff;--tx:#150a2b;--mut:#7a7194;--br:#e6e0f2;--pri:#7b0dfd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b0618;--card:#171029;--tx:#f1ecfc;--mut:#a79bc8;--br:#2b1f4a;--pri:#9a47ff}}
+*{box-sizing:border-box;margin:0}html,body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{max-width:980px;margin:0 auto;min-height:100vh;padding-bottom:80px}button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+header{background:#150a2b;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}header button{color:#d9c5ff;font-size:13px}
+.w{padding:16px}h2{font-size:20px;margin:4px 0 12px}.sub{color:var(--mut);font-size:13px}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}.card{background:var(--card);border:1.5px solid var(--br);border-radius:18px;padding:14px}
+.fee{font-size:22px;font-weight:800}.st{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--bg)}
+.btn{display:block;width:100%;background:var(--pri);color:#fff;padding:13px;border-radius:14px;font-weight:700;margin-top:8px}.pill{background:var(--pri);color:#fff;padding:9px 14px;border-radius:99px;font-weight:700}
+input,select{width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--br);background:var(--bg);margin:6px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chip{padding:7px 12px;border-radius:99px;background:var(--bg);font-size:13px;font-weight:600}.chip.a{background:var(--pri);color:#fff}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}.kpi b{font-size:24px;display:block}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:980px;display:flex;background:var(--card);border-top:1px solid var(--br);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;padding:14px 2px;font-weight:700;color:var(--mut)}nav .a{color:var(--pri)}.login{max-width:380px;margin:12vh auto;padding:0 18px}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:11px 18px;border-radius:99px;font-size:13px}:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+</style></head><body><div id="app"></div>
+<script>
+var CAT={food:"Food & Supplements",med:"Pharmacy",re:"Real Estate"},seq=1040;
+var TPL=[["food","Lekki Phase 1","SmartyHub Organic Kitchen","12 Fola Osibo St, Lekki",1800],["med","Ikeja","HosiRx Pharmacy, Allen Ave","7 Opebi Rd, Ikeja",2200],["re","Victoria Island","MainTown Realty Office","Eko Atlantic Chambers, VI",1500],["food","Yaba","SmartyHub Organic Hub","UNILAG Gate, Akoka",2100],["med","Lekki Phase 1","HosiRx Lekki","3 Admiralty Way, Lekki",1600]];
+function mk(t,s){seq++;return{id:"SH-"+seq,cat:t[0],zone:t[1],from:t[2],to:t[3],fee:t[4],st:s||"open",fleet:null,rider:null}}
+var S={ok:false,tab:"orders",toast:"",orders:TPL.map(function(t){return mk(t)}),riders:{swift:2,kobo:1,own:1},
+fleets:[{id:"own",name:"SmartyHub Fleet",comm:0,cats:["food","med","re"]},{id:"swift",name:"SwiftMove Logistics",comm:15,cats:["food","re"]},{id:"kobo",name:"KoboRide Dispatch",comm:12,cats:["food","med"]}]};
+S.orders[0].fleet="swift";S.orders[0].st="delivered";S.orders[0].rider="Chidi Obi";S.orders[3].fleet="kobo";S.orders[3].st="delivered";S.orders[3].rider="Musa Ali";
+function N(n){return "₦"+Math.round(n).toLocaleString("en-NG")}function fl(i){return S.fleets.find(function(f){return f.id===i})}
+function toast(m){S.toast=m;R();setTimeout(function(){S.toast="";R()},1800)}
+function tog(id,k){var a=fl(id).cats,i=a.indexOf(k);i<0?a.push(k):a.splice(i,1);R()}
+function setC(id,v){fl(id).comm=Math.max(0,Math.min(50,+v||0));R()}
+function sim(){var o=mk(TPL[Math.floor(Math.random()*TPL.length)]);S.orders.unshift(o);toast("Order received: "+o.id)}
+function route(id,f){var o=S.orders.find(function(x){return x.id===id});if(!f)return;o.fleet=f==="pool"?null:f;toast(f==="pool"?"Released to open pool":"Routed to "+fl(f).name)}
+function login(){if(document.getElementById("pw").value!=="admin123")return toast("Wrong passcode");S.ok=true;R()}
+function R(){var a=document.getElementById("app"),h="";
+if(!S.ok){a.innerHTML='<div class="login"><h2>SmartyHub Admin</h2><p class="sub">Staff only. Route orders, approve fleets and track commission.</p><input id="pw" type="password" placeholder="Admin passcode" autofocus><button class="btn" onclick="login()">Sign in</button><p class="sub" style="margin-top:12px">Demo passcode: admin123. Replace with Supabase auth before launch.</p></div>'+(S.toast?'<div class="toast">'+S.toast+'</div>':"");return}
+var d=S.orders.filter(function(o){return o.st==="delivered"}),g=d.reduce(function(a,o){return a+o.fee},0),c=d.reduce(function(a,o){return a+(o.fleet?o.fee*fl(o.fleet).comm/100:0)},0);
+if(S.tab==="orders")h='<div class="row"><h2>All orders ('+S.orders.length+')</h2><button class="pill" onclick="sim()">+ Simulate order</button></div><div class="grid">'+S.orders.map(function(o){var el=S.fleets.filter(function(f){return f.cats.indexOf(o.cat)>-1});return '<div class="card"><div class="row"><span class="fee">'+N(o.fee)+'</span><span class="st">'+o.st.toUpperCase()+'</span></div><div class="sub">'+o.id+' · '+CAT[o.cat]+' · '+o.zone+'</div><p style="margin:8px 0">'+o.from+'<br><span class="sub">to</span> '+o.to+'</p><div class="sub">'+(o.fleet?fl(o.fleet).name:"Open pool")+(o.rider?" · "+o.rider:"")+'</div>'+(o.st==="open"?'<select onchange="route(\''+o.id+'\',this.value)"><option value="">Route to…</option><option value="pool">Open pool</option>'+el.map(function(f){return '<option value="'+f.id+'">'+f.name+'</option>'}).join("")+'</select>':"")+'</div>'}).join("")+'</div>';
+if(S.tab==="fleets")h='<h2>Fleets & approvals</h2><div class="grid">'+S.fleets.map(function(f){return '<div class="card"><b>'+f.name+'</b><div class="sub">'+S.riders[f.id]+' riders</div><div class="chips">'+["food","med","re"].map(function(k){return '<button class="chip '+(f.cats.indexOf(k)>-1?"a":"")+'" onclick="tog(\''+f.id+"','"+k+'\')">'+CAT[k]+'</button>'}).join("")+'</div><label class="sub">Commission %</label><input type="number" value="'+f.comm+'" onchange="setC(\''+f.id+'\',this.value)"></div>'}).join("")+'</div>';
+if(S.tab==="stats")h='<h2>Overview</h2><div class="kpi"><div class="card"><span class="sub">Orders</span><b>'+S.orders.length+'</b></div><div class="card"><span class="sub">Delivered</span><b>'+d.length+'</b></div><div class="card"><span class="sub">Gross fees</span><b>'+N(g)+'</b></div><div class="card"><span class="sub">Hub commission</span><b>'+N(c)+'</b></div></div>'+Object.keys(CAT).map(function(k){var t=d.filter(function(o){return o.cat===k}).reduce(function(a,o){return a+o.fee},0);return '<div class="card row" style="margin-bottom:8px"><span>'+CAT[k]+'</span><b>'+N(t)+'</b></div>'}).join("");
+a.innerHTML='<header>SmartyHub Admin<button onclick="S.ok=false;R()">Sign out</button></header><div class="w">'+h+'</div><nav>'+[["orders","Orders"],["fleets","Fleets"],["stats","Stats"]].map(function(t){return '<button class="'+(S.tab===t[0]?"a":"")+'" onclick="S.tab=\''+t[0]+'\';R()">'+t[1]+'</button>'}).join("")+'</nav>'+(S.toast?'<div class="toast">'+S.toast+'</div>':"")}
+R();
+</script></body></html>

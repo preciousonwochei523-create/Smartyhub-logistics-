@@ -3,9 +3,10 @@
 Rider, fleet (3PL) and hub-admin app in a single static `index.html`. Demo data only; the Supabase backend comes next.
 
 ## Files
-- `index.html` the whole app
+- `index.html` rider and logistics-company app
+- `admin.html` separate hub admin (demo passcode admin123, not linked from the app)
 - `manifest.webmanifest`, `sw.js` installable PWA and offline shell (needs HTTPS)
-- `assets/` official logo, header crops and app icons
+- `assets/` official logo (logo-trim.png is the login logo), hex, wordmark and app icons
 
 ## Push to GitHub
 ```
