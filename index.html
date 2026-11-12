@@ -40,21 +40,45 @@ nav button{flex:1;padding:9px 2px;font-size:11px;font-weight:600;color:var(--mut
 .cred{background:var(--bg);border-radius:14px;padding:12px;margin-bottom:10px}pre{background:#150a2b;color:#d9c5ff;padding:12px;border-radius:12px;font-size:12px;overflow-x:auto}
 @media (prefers-reduced-motion:no-preference){.o{animation:in .25s ease-out}@keyframes in{from{transform:translateY(8px);opacity:0}}}
 </style></head><body><div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
 <script>
 var P={eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',home:'<path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',bike:'<circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><path d="M15 6h-3l-3 6 3 5.5M5.5 17.5 9 12h8l1.5 5.5"/>',wallet:'<path d="M20 7H5a2 2 0 0 1 0-4h13v4zM3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16" cy="14" r="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',users:'<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6"/>',plug:'<path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"/>',inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13l3.5 7v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>',bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"/>',truck:'<path d="M1 3h13v13H1zM14 8h5l3 3v5h-8"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>'};
 function ic(n,s){s=s||22;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;flex:none">'+P[n]+'</svg>'}
 var BANKS=[["044","Access Bank"],["058","GTBank"],["057","Zenith Bank"],["033","UBA"],["011","First Bank"],["999992","Opay"],["999991","PalmPay"],["50211","Kuda"],["50515","Moniepoint"],["035","Wema Bank"],["070","Fidelity Bank"],["232","Sterling Bank"],["032","Union Bank"],["221","Stanbic IBTC"],["214","FCMB"],["050","Ecobank"],["076","Polaris Bank"],["082","Keystone Bank"]];
 function bankForm(b){b=b||{};return '<label class="sub" for="bk">Bank</label><select id="bk"><option value="">Choose bank…</option>'+BANKS.map(function(x){return '<option value="'+x[0]+'"'+(b.code===x[0]?" selected":"")+'>'+x[1]+'</option>'}).join("")+'</select><label class="sub" for="ba">Account number</label><input id="ba" inputmode="numeric" maxlength="10" placeholder="10 digits" value="'+(b.no||"")+'"><label class="sub" for="bn">Account name</label><input id="bn" placeholder="Name on the account" value="'+(b.name||"")+'">'}
 function readBank(){var c=$("bk"),n=$("ba"),a=$("bn");if(!c||!/^\d{10}$/.test(n)||!a){toast("Choose your bank and enter a 10-digit account number and account name");return null}return{code:c,bank:BANKS.find(function(x){return x[0]===c})[1],no:n,name:a}}
-function saveBank(){var b=readBank();if(!b)return;rd(S.me).bank=b;toast("Payout account saved")}
 var CAT={food:{n:"Food & Supplements",src:"SmartyHub Organic"},med:{n:"Pharmacy",src:"HosiRx"},re:{n:"Real Estate",src:"MainTown Realty"}};
-var ZONES=["Lekki Phase 1","Ikeja","Victoria Island","Yaba","Surulere"];
-var TPL=[["food","Lekki Phase 1","SmartyHub Organic Kitchen, Admiralty Way","12 Fola Osibo St, Lekki",3.2,1800,"Keep food hot. Pay on delivery: ₦9,500."],["med","Ikeja","HosiRx Pharmacy, Allen Ave","7 Opebi Rd, Ikeja",4.1,2200,"Hand over to recipient only.","4821"],["re","Victoria Island","MainTown Realty Office, Adeola Odeku","Eko Atlantic Legal Chambers, VI",2.6,1500,"Signed tenancy documents. Get a signed receipt."],["food","Yaba","SmartyHub Organic Hub, Herbert Macaulay","UNILAG Gate, Akoka",5.4,2100,"Supplement pack, no refrigeration."],["med","Lekki Phase 1","HosiRx Pharmacy, Lekki Phase 1","3 Admiralty Way, Lekki",1.8,1600,"Prescription meds. Check recipient ID.","7305"],["re","Ikeja","MainTown Realty Ikeja Desk","15 Awolowo Way, Ikeja",3.7,1900,"Keys and inspection pack."],["food","Surulere","SmartyHub Organic Kitchen, Adeniran Ogunsanya","22 Bode Thomas St, Surulere",2.2,1400,"Meal prep boxes x4. Keep upright."],["med","Victoria Island","HosiRx Hospital Pharmacy, Ozumba Mbadiwe","Block C, Oniru Estate, VI",3.0,2000,"Urgent. Discharge medication.","1198"]];
-var seq=1040;function mk(t){seq++;return{id:"SH-"+seq,cat:t[0],zone:t[1],from:t[2],to:t[3],km:t[4],fee:t[5],note:t[6],pin:t[7]||"",st:"open",fleet:null,rider:null}}
-var S={role:null,me:null,tab:"",lr:"rider",mode:"in",toast:"",skip:[],cred:null,
-fleets:[{id:"own",name:"SmartyHub Fleet",comm:0,cats:["food","med","re"],key:"shl_live_own_8f2a91"},{id:"swift",name:"SwiftMove Logistics",comm:15,cats:["food","re"],key:"shl_live_swf_c47d02"},{id:"kobo",name:"KoboRide Dispatch",comm:12,cats:["food","med"],key:"shl_live_kbr_19be77"},{id:"solo",name:"Independent rider",comm:0,cats:["food","med","re"],key:""}],
-riders:[{id:"r1",name:"Tunde Ade",phone:"08012345678",pin:"1234",fleet:"own",on:true,zones:ZONES.slice(),cats:["food","med","re"]},{id:"r2",name:"Chidi Obi",phone:"08023456789",pin:"1234",fleet:"swift",on:true,zones:ZONES.slice(),cats:["food","re"]},{id:"r3",name:"Sade Bello",phone:"08034567890",pin:"1234",fleet:"swift",on:false,zones:ZONES.slice(),cats:["food","re"]},{id:"r4",name:"Musa Ali",phone:"08055678901",pin:"1234",fleet:"kobo",on:true,zones:ZONES.slice(),cats:["food","med"]}],
-orders:TPL.map(mk)};
+var CMAP={food_supplement:"food",pharmacy:"med",document_parcel:"re"},CREV={food:"food_supplement",med:"pharmacy",re:"document_parcel"},SMAP={open:"open",claimed:"open",assigned:"assigned",picked_up:"picked",delivered:"delivered",cancelled:"cancelled"};
+var CFG=window.SHL||{},sb=window.supabase&&CFG.key&&CFG.key.indexOf("PASTE")<0?supabase.createClient(CFG.url,CFG.key):null,ZONES=[];
+var S={role:null,me:null,tab:"",lr:"rider",mode:"in",toast:"",skip:[],cred:null,ready:false,fleets:[],riders:[],orders:[],zones:[]};
+function mapD(d){return{id:d.id,ref:d.ref,cat:CMAP[d.category],zone:d.zone||"",from:(d.pickup_name?d.pickup_name+", ":"")+d.pickup_address,to:d.drop_address,fee:+d.fee||0,note:[d.note,d.cod_amount>0?"Collect "+N(d.cod_amount)+" cash":""].filter(Boolean).join(". "),pin:d.requires_code?"1":"",st:SMAP[d.status],fleet:d.fleet_id,rider:d.rider_id,dn:d.drop_name,dp:d.drop_phone,pp:d.pickup_phone}}
+function mail(p){return"234"+String(p).replace(/\D/g,"").slice(-10)+"@riders.smartyhub.app"}
+async function boot(){
+ var ses=(await sb.auth.getSession()).data.session;
+ if(!ses){S.role=null;S.ready=true;return R()}
+ var p=(await sb.from("profiles").select("*").eq("user_id",ses.user.id).maybeSingle()).data;
+ if(!p||p.role==="admin"){await sb.auth.signOut();S.role=null;S.ready=true;R();return toast(p?"Admins sign in at admin.html":"This account has no access yet")}
+ S.role=p.role==="rider"?"rider":"fleet";
+ var f=(await sb.from("fleets").select("*").eq("id",p.fleet_id)).data||[];
+ S.fleets=f.map(function(x){return{id:x.id,name:x.name,comm:+x.commission_pct,cats:(x.categories||[]).map(function(c){return CMAP[c]})}});
+ if(!S.tab)S.tab=S.role==="rider"?"home":"orders";
+ await refresh(true);S.ready=true;R();listen()}
+async function refresh(first){
+ var s=(await sb.auth.getSession()).data.session;if(!s)return;
+ var old=S.orders.filter(function(o){return o.st==="open"&&!o.rider}).map(function(o){return o.id});
+ var q=await Promise.all([sb.from("deliveries").select("*").order("created_at",{ascending:false}).limit(200),sb.from("riders").select("*"),sb.from("zones").select("name").order("name")]);
+ if(q[0].error)return;
+ S.orders=(q[0].data||[]).map(mapD);S.zones=(q[2].data||[]).map(function(z){return z.name});ZONES=S.zones;
+ S.riders=(q[1].data||[]).map(function(r){return{id:r.id,uid:r.user_id,name:r.name,phone:r.phone,fleet:r.fleet_id,on:r.online,zones:r.zones||[],cats:(r.categories||[]).map(function(c){return CMAP[c]})}});
+ if(S.role==="rider"){var me=S.riders.find(function(r){return r.uid===s.user.id});S.me=me&&me.id;var b=(await sb.rpc("rider_my_bank")).data;if(me&&b&&b[0])me.bank={code:b[0].bank_code,bank:b[0].bank_name,no:b[0].account_number,name:b[0].account_name}}
+ else S.me=S.fleets[0]&&S.fleets[0].id;
+ if(first)return;
+ var fresh=S.orders.filter(function(o){return o.st==="open"&&!o.rider&&old.indexOf(o.id)<0}).length;
+ var ae=document.activeElement;if(ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName))return;
+ if(fresh&&S.role==="rider"&&rd(S.me)&&rd(S.me).on){if(navigator.vibrate)navigator.vibrate([200,100,200]);toast("New order request")}else R()}
+var ch=null;
+function listen(){if(ch)return;ch=sb.channel("d").on("postgres_changes",{event:"*",schema:"public",table:"deliveries"},function(){clearTimeout(window._t);window._t=setTimeout(function(){refresh()},400)}).subscribe();setInterval(function(){if(S.role)refresh()},20000)}
 function N(n){return "₦"+Math.round(n).toLocaleString("en-NG")}
 function fl(i){return S.fleets.find(function(f){return f.id===i})}function rd(i){return S.riders.find(function(r){return r.id===i})}function od(i){return S.orders.find(function(o){return o.id===i})}
 function $(i){return document.getElementById(i).value.trim()}
@@ -63,65 +87,79 @@ function tog(a,v){var i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);R()}function go
 function mp(a){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a+", Lagos, Nigeria")}
 function wa(ph,txt){ph=ph.replace(/\D/g,"").replace(/^0/,"234");return "https://wa.me/"+ph+"?text="+encodeURIComponent(txt)}
 function elig(o,f){return fl(f).cats.indexOf(o.cat)>-1}
-function feedOf(r){return S.orders.filter(function(o){return o.st==="open"&&!o.rider&&(!o.fleet||o.fleet===r.fleet)&&elig(o,r.fleet)&&r.zones.indexOf(o.zone)>-1&&r.cats.indexOf(o.cat)>-1&&S.skip.indexOf(o.id)<0})}
+function feedOf(r){return S.orders.filter(function(o){return o.st==="open"&&!o.rider&&S.skip.indexOf(o.id)<0})}
 var GOOGLE='<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.1-4 1.1-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.4 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.4a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4A12 12 0 0 0 1.4 6.6l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"/></svg>';
-function quick(k){if(k==='r'){S.role='rider';S.me='r1';S.tab='home'}else{S.role='fleet';S.me='swift';S.tab='orders'}R()}
-function login(){var p=$("p"),pin=$("pin");
-if(S.lr==="fleet"){var f=$("fs");if(!pin)return toast("Enter your company PIN");S.role="fleet";S.me=f;S.tab="orders"}
-else{var x=S.riders.find(function(q){return q.phone===p});
-if(S.mode==="in"){if(!x||x.pin!==pin)return toast("Wrong phone number or PIN")}
-else{var n=$("n");if(!n||!p||pin.length<4)return toast("Fill every field. PIN is 4 digits");if(x)return toast("Phone already registered");var bk=readBank();if(!bk)return;x={bank:bk,id:"r"+(S.riders.length+1),name:n,phone:p,pin:pin,fleet:"solo",on:true,zones:ZONES.slice(0,3),cats:["food","med","re"]};S.riders.push(x)}
-S.role="rider";S.me=x.id;S.tab="home"}R()}
-function out(){S.role=null;S.me=null;R()}
-function claim(id){od(id).fleet=S.me;toast("Claimed for your fleet")}
-function assign(id){var v=document.getElementById("as-"+id).value;if(!v)return toast("Pick a rider");var o=od(id);o.rider=v;o.fleet=S.me;o.st="assigned";toast("Assigned to "+rd(v).name)}
-function accept(id){var r=rd(S.me),o=od(id);o.rider=r.id;o.fleet=r.fleet;o.st="assigned";S.tab="active";toast("Order "+id+" accepted")}
+function E(e){if(e&&e.error){toast(String(e.error.message||"Something went wrong"));return true}return false}
+async function rpc(fn,args,after){var r=await sb.rpc(fn,args);if(E(r))return;await refresh(true);if(after)after();R()}
+async function fnErr(x,d){var m=d;try{m=(await x.error.context.json()).error||d}catch(e){}return m}
+async function login(){
+ if(!sb)return toast("App not configured yet. Add your key in config.js");
+ var pin=$("pin");
+ if(S.lr==="fleet"){var em=$("em");if(!em||!pin)return toast("Enter your email and password");var x=await sb.auth.signInWithPassword({email:em,password:pin});if(x.error)return toast("Wrong email or password");return boot()}
+ var p=$("p");
+ if(S.mode==="in"){if(!p||!pin)return toast("Enter your phone number and PIN");var y=await sb.auth.signInWithPassword({email:mail(p),password:pin});if(y.error)return toast("Wrong phone number or PIN");return boot()}
+ var n=$("n");if(!n||p.replace(/\D/g,"").length<10||!/^\d{6}$/.test(pin))return toast("Fill every field. PIN is 6 digits");var bk=readBank();if(!bk)return;
+ var z=await sb.functions.invoke("create-rider",{body:{self:true,name:n,phone:p,pin:pin,bank:bk}});
+ if(z.error)return toast(await fnErr(z,"Could not register"));
+ var w=await sb.auth.signInWithPassword({email:mail(p),password:pin});if(w.error)return toast("Registered. Please log in.");boot()}
+async function out(){await sb.auth.signOut();S.role=null;S.me=null;S.orders=[];S.tab="";R()}
+function claim(id){rpc("claim_delivery",{p_id:id},function(){toast("Claimed for your fleet")})}
+function assign(id){var v=document.getElementById("as-"+id).value;if(!v)return toast("Pick a rider");rpc("assign_delivery",{p_id:id,p_rider:v},function(){toast("Assigned to "+rd(v).name)})}
+function accept(id){rpc("accept_delivery",{p_id:id},function(){S.tab="active";toast("Order accepted")})}
 function skip(id){S.skip.push(id);R()}
-function adv(id){var o=od(id);if(o.st==="assigned"){o.st="picked";return R()}
-if(o.pin&&$("pin-"+id)!==o.pin)return toast("Wrong delivery code");o.st="delivered";toast("Delivered. Great work!")}
-function msg(o){return "New delivery "+o.id+" ("+CAT[o.cat].n+")\nPickup: "+o.from+"\nDrop-off: "+o.to+"\nFee: "+N(o.fee)+"\n"+o.note+"\nOpen the app: "+location.href.split("#")[0]}
+function adv(id){var o=od(id);if(o.st==="assigned")return rpc("advance_delivery",{p_id:id});
+ var c=o.pin?$("pin-"+id):null;if(o.pin&&!c)return toast("Enter the customer's 4-digit code");
+ rpc("advance_delivery",{p_id:id,p_code:c},function(){toast("Delivered. Your payment is on its way")})}
+async function setPrefs(){var r=rd(S.me);E(await sb.rpc("rider_set_prefs",{p_online:r.on,p_zones:r.zones,p_cats:r.cats.map(function(c){return CREV[c]})}));await refresh(true);R()}
+function togOnline(){var r=rd(S.me);r.on=!r.on;R();setPrefs()}
+function tz(k){tog(rd(S.me).zones,k);setPrefs()}function tc(k){tog(rd(S.me).cats,k);setPrefs()}
+async function saveBank(){var b=readBank();if(!b)return;var x=await sb.rpc("rider_set_bank",{p_code:b.code,p_bank:b.bank,p_number:b.no,p_name:b.name});if(E(x))return;await refresh(true);toast("Payout account saved")}
+function msg(o){return "New delivery "+o.ref+" ("+CAT[o.cat].n+")\nPickup: "+o.from+"\nDrop-off: "+o.to+"\nFee: "+N(o.fee)+"\n"+o.note+"\nOpen the app: "+location.href.split("#")[0]}
 function route(o){return '<div class="rt"><div><small>Pickup</small>'+o.from+'</div><div><small>Drop-off</small>'+o.to+'</div></div>'}
-function head(o){return '<div class="row"><span class="fee">'+N(o.fee)+'</span><span class="tag">'+CAT[o.cat].n+'</span></div><div class="sub">'+o.id+' · '+o.km+' km · '+o.zone+'</div>'+route(o)}
+function head(o){return '<div class="row"><span class="fee">'+N(o.fee)+'</span><span class="tag">'+CAT[o.cat].n+'</span></div><div class="sub">'+o.ref+' · '+o.zone+'</div>'+route(o)}
 function ocard(o,m){var h='<div class="o">'+head(o);
 if(m!=="active")h+='<div class="sub">'+o.note+(o.pin?" Delivery code required.":"")+'</div>';
 if(m==="accept")h+='<div class="two"><button class="btn s" onclick="skip(\''+o.id+'\')">Skip</button><button class="btn" onclick="accept(\''+o.id+'\')">Accept '+N(o.fee)+'</button></div>';
 if(m==="claim")h+='<button class="btn" onclick="claim(\''+o.id+'\')">Claim for fleet</button>';
 if(m==="active"){h+='<div class="steps"><i class="d"></i><i class="'+(o.st==="picked"?"d":"")+'"></i><i></i></div><div class="sub">'+(o.st==="assigned"?"Heading to pickup":"Picked up, on the way")+'</div>';
+var ph=o.st==="assigned"?o.pp:o.dp;if(ph)h+='<a class="btn s" href="tel:'+ph+'">Call '+(o.st==="assigned"?"pickup":(o.dn||"customer"))+'</a>';
 if(o.st==="picked"&&o.pin)h+='<input id="pin-'+o.id+'" inputmode="numeric" maxlength="4" placeholder="Customer’s 4-digit code">';
 h+='<button class="btn" onclick="adv(\''+o.id+'\')">'+(o.st==="assigned"?"Confirm pickup":"Mark delivered")+'</button><a class="btn s" target="_blank" rel="noopener" href="'+mp(o.st==="assigned"?o.from:o.to)+'">Navigate</a>'}
 if(m==="assign"){h+='<select id="as-'+o.id+'"><option value="">Choose rider…</option>'+S.riders.filter(function(r){return r.fleet===o.fleet}).map(function(r){return '<option value="'+r.id+'">'+r.name+(r.on?"":" (offline)")+'</option>'}).join("")+'</select><button class="btn" onclick="assign(\''+o.id+'\')">Assign in app</button>'+S.riders.filter(function(r){return r.fleet===o.fleet}).map(function(r){return ""}).join("")+'<button class="btn wa" onclick="shareSel(\''+o.id+'\')">Send via WhatsApp</button>'}
-if(m==="info")h+='<div class="sub">'+o.st.toUpperCase()+(o.rider?" · "+rd(o.rider).name:"")+'</div>';
+if(m==="info")h+='<div class="sub">'+o.st.toUpperCase()+(o.rider?" · "+(rd(o.rider)||{name:"Rider"}).name:"")+'</div>';
 return h+'</div>'}
-function shareSel(id){var v=document.getElementById("as-"+id).value;if(!v)return toast("Pick a rider first");var o=od(id);o.rider=v;o.st="assigned";window.open(wa(rd(v).phone,msg(o)),"_blank");R()}
+async function shareSel(id){var v=document.getElementById("as-"+id).value;if(!v)return toast("Pick a rider first");var o=od(id),x=await sb.rpc("assign_delivery",{p_id:id,p_rider:v});if(E(x))return;window.open(wa(rd(v).phone,msg(o)),"_blank");await refresh(true);R()}
 function list(a,m,e){return a.length?a.map(function(o){return ocard(o,m)}).join(""):'<div class="empty">'+e+'</div>'}
 function chips(arr,all,fn,lab){return '<div class="chips">'+all.map(function(k){return '<button class="chip '+(arr.indexOf(k)>-1?"a":"")+'" onclick="'+fn+"('"+k+"')\">"+(lab?lab(k):k)+'</button>'}).join("")+'</div>'}
-function tz(k){tog(rd(S.me).zones,k)}function tc(k){tog(rd(S.me).cats,k)}
 function mapTop(r){return '<div class="map"><div class="top"><span class="fab">'+ic("user",16)+' '+r.name.split(" ")[0]+'</span><span class="fab">'+N(S.orders.filter(function(o){return o.rider===r.id&&o.st==="delivered"}).reduce(function(a,o){return a+o.fee},0))+'</span></div></div>'}
 function rview(){var r=rd(S.me),f=fl(r.fleet),h="",feed=feedOf(r),act=S.orders.filter(function(o){return o.rider===r.id&&(o.st==="assigned"||o.st==="picked")}),dn=S.orders.filter(function(o){return o.rider===r.id&&o.st==="delivered"}),g=dn.reduce(function(a,o){return a+o.fee},0);
-if(S.tab==="home"){h=mapTop(r)+'<div class="sheet"><button class="go '+(r.on?"on":"")+'" onclick="rd(S.me).on=!rd(S.me).on;R()">'+(r.on?"ONLINE":"GO")+'</button><div class="sub" style="text-align:center">'+(r.on?"Looking for deliveries in your zones":"You are offline")+' · '+f.name+'</div>'+(r.bank?"":'<button class="o" style="width:100%;text-align:left;border-color:var(--warn)" onclick="go(\'me\')"><b>Add your bank details</b><div class="sub">You need them to get paid for deliveries.</div></button>')+'<div class="stats"><div><b>'+dn.length+'</b><span class="sub">Done</span></div><div><b>'+N(g)+'</b><span class="sub">Earned</span></div><div><b>'+act.length+'</b><span class="sub">Active</span></div></div>'+(r.on&&feed[0]?'<h3 style="margin-bottom:8px">New request</h3>'+ocard(feed[0],"accept"):'<div class="empty">'+(r.on?"No requests right now.":"Go online to receive requests.")+'</div>')+'</div>'}
+if(S.tab==="home"){h=mapTop(r)+'<div class="sheet"><button class="go '+(r.on?"on":"")+'" onclick="togOnline()">'+(r.on?"ONLINE":"GO")+'</button><div class="sub" style="text-align:center">'+(r.on?"Looking for deliveries in your zones":"You are offline")+' · '+f.name+'</div>'+(r.bank?"":'<button class="o" style="width:100%;text-align:left;border-color:var(--warn)" onclick="go(\'me\')"><b>Add your bank details</b><div class="sub">You need them to get paid for deliveries.</div></button>')+'<div class="stats"><div><b>'+dn.length+'</b><span class="sub">Done</span></div><div><b>'+N(g)+'</b><span class="sub">Earned</span></div><div><b>'+act.length+'</b><span class="sub">Active</span></div></div>'+(r.on&&feed[0]?'<h3 style="margin-bottom:8px">New request</h3>'+ocard(feed[0],"accept"):'<div class="empty">'+(r.on?"No requests right now.":"Go online to receive requests.")+'</div>')+'</div>'}
 if(S.tab==="feed")h='<div class="sheet" style="margin-top:0;border-radius:0"><h2>Requests ('+feed.length+')</h2>'+(r.on?list(feed,"accept","No orders match your zones and categories."):'<div class="empty">Go online to see requests.</div>')+'</div>';
 if(S.tab==="active")h='<div class="sheet" style="margin-top:0;border-radius:0"><h2>Active deliveries</h2>'+list(act,"active","No active deliveries.")+'</div>';
 if(S.tab==="earn")h='<div class="sheet" style="margin-top:0;border-radius:0"><h2>Earnings</h2><div class="stats" style="grid-template-columns:1fr 1fr"><div><b>'+N(g)+'</b><span class="sub">Gross</span></div><div><b>'+N(g*(1-f.comm/100))+'</b><span class="sub">Net after '+f.comm+'% commission</span></div></div>'+list(dn,"info","No completed deliveries yet.")+'</div>';
-if(S.tab==="me")h='<div class="sheet" style="margin-top:0;border-radius:0"><h2>'+r.name+'</h2><div class="sub" style="margin-bottom:14px">'+r.phone+' · '+f.name+'</div><h3>Payout account</h3>'+bankForm(r.bank)+'<button class="btn" onclick="saveBank()">Save payout account</button><h3 style="margin-top:16px">Zones</h3>'+chips(r.zones,ZONES,"tz")+'<h3>Categories</h3>'+chips(r.cats,f.cats,"tc",function(k){return CAT[k].n})+'<button class="btn s" onclick="out()">Log out</button></div>';
+if(S.tab==="me")h='<div class="sheet" style="margin-top:0;border-radius:0"><h2>'+r.name+'</h2><div class="sub" style="margin-bottom:14px">'+r.phone+' · '+f.name+'</div><h3>Payout account</h3>'+bankForm(r.bank)+'<button class="btn" onclick="saveBank()">Save payout account</button><h3 style="margin-top:16px">Zones</h3><p class="sub">Leave all off to see every zone.</p>'+chips(r.zones,S.zones,"tz")+'<h3>Categories</h3>'+chips(r.cats,f.cats,"tc",function(k){return CAT[k].n})+'<button class="btn s" onclick="out()">Log out</button></div>';
 return h}
 function fview(){var f=fl(S.me),h="",pool=S.orders.filter(function(o){return o.st==="open"&&!o.fleet&&elig(o,f.id)}),mine=S.orders.filter(function(o){return o.fleet===f.id}),un=mine.filter(function(o){return o.st==="open"&&!o.rider}),rs=S.riders.filter(function(r){return r.fleet===f.id});
 var b='<div class="sheet" style="margin-top:0;border-radius:0">';
 if(S.tab==="orders")h=b+'<h2>Open orders ('+pool.length+')</h2>'+list(pool,"claim","No open orders for your categories.")+'<h2>Dispatch ('+un.length+')</h2>'+list(un,"assign","Claim an order to assign it to a rider.")+'<h2>Live & done</h2>'+list(mine.filter(function(o){return o.rider}),"info","Nothing yet.")+'</div>';
-if(S.tab==="riders"){h=b+'<h2>Your riders ('+rs.length+')</h2>'+rs.map(function(r){return '<div class="cred"><div class="row"><b>'+r.name+'</b><span class="sub">'+(r.on?"Online":"Offline")+'</span></div><div class="sub">'+r.phone+' · PIN '+r.pin+' · '+(r.bank?"Bank added":"No bank yet")+'</div></div>'}).join("")+'<div class="o"><h3>Create rider sub-account</h3><input id="rn" placeholder="Full name"><input id="rp" type="tel" placeholder="Phone (08012345678)"><button class="btn" onclick="addR()">Create account</button></div>'+(S.cred?'<div class="cred"><b>'+S.cred.name+' created</b><div class="sub">Login: '+S.cred.phone+' · PIN '+S.cred.pin+'</div><a class="btn wa" target="_blank" rel="noopener" href="'+wa(S.cred.phone,"Hi "+S.cred.name+", your SmartyHub rider account is ready.\nPhone: "+S.cred.phone+"\nPIN: "+S.cred.pin+"\nLog in: "+location.href.split("#")[0])+'">Send login via WhatsApp</a></div>':"")+'</div>'}
-if(S.tab==="api")h=b+'<h2>API & webhooks</h2><div class="cred"><div class="sub">API key</div><b style="word-break:break-all">'+f.key+'</b></div><pre>GET  /api/fleet/orders?zone=ikeja\nPOST /api/orders/{id}/claim\nPOST /api/orders/{id}/assign\n     {"rider_id":"r2"}\nWebhook: order.available</pre><p class="sub" style="margin:10px 0">Demo only. Live endpoints arrive with the Supabase backend.</p><button class="btn s" onclick="out()">Log out</button></div>';
+if(S.tab==="riders"){h=b+'<h2>Your riders ('+rs.length+')</h2>'+rs.map(function(r){return '<div class="cred"><div class="row"><b>'+r.name+'</b><span class="sub">'+(r.on?"Online":"Offline")+'</span></div><div class="sub">'+r.phone+'</div></div>'}).join("")+'<div class="o"><h3>Create rider sub-account</h3><input id="rn" placeholder="Full name"><input id="rp" type="tel" placeholder="Phone (08012345678)"><button class="btn" onclick="addR()">Create account</button></div>'+(S.cred?'<div class="cred"><b>'+S.cred.name+' created</b><div class="sub">Login: '+S.cred.phone+' · PIN '+S.cred.pin+'</div><a class="btn wa" target="_blank" rel="noopener" href="'+wa(S.cred.phone,"Hi "+S.cred.name+", your SmartyHub rider account is ready.\nPhone: "+S.cred.phone+"\nPIN: "+S.cred.pin+"\nLog in: "+location.href.split("#")[0])+'">Send login via WhatsApp</a></div>':"")+'</div>'}
+if(S.tab==="api")h=b+'<h2>Account</h2><div class="cred"><b>'+f.name+'</b><div class="sub">Commission '+f.comm+'%</div></div><p class="sub" style="margin:10px 0">New orders appear here live. Claim an order, then assign it to one of your riders.</p><button class="btn s" onclick="out()">Log out</button></div>';
 return h}
-function addR(){var n=$("rn"),p=$("rp");if(!n||!p)return toast("Enter name and phone");var pin=String(1000+Math.floor(Math.random()*9000)),x={id:"r"+(S.riders.length+1),name:n,phone:p,pin:pin,fleet:S.me,on:true,zones:ZONES.slice(),cats:fl(S.me).cats.slice()};S.riders.push(x);S.cred=x;toast("Rider account created")}
+async function addR(){var n=$("rn"),p=$("rp");if(!n||!p)return toast("Enter name and phone");var x=await sb.functions.invoke("create-rider",{body:{name:n,phone:p}});if(x.error)return toast(await fnErr(x,"Could not create the account"));S.cred=x.data;await refresh(true);toast("Rider account created")}
 function R(){var a=document.getElementById("app"),h="",T,body;
+if(!S.ready){a.innerHTML='<div class="login"><p class="sub">Loading…</p></div>';return}
+if(S.role==="rider"&&!rd(S.me)){a.innerHTML='<div class="login"><h2>Rider profile not found</h2><p class="sub">Ask your company to check your account.</p><button class="btn s" onclick="out()">Log out</button></div>';return}
 if(!S.role){var r=S.lr,f=S.mode==="in",fm=r==="fleet";
 h='<div class="login"><div class="brand"><img src="assets/hex-t.png" alt=""><div><b>SmartyHub Logistics</b><span class="sub">Deliver more, on your terms.</span></div></div><h1>Welcome back</h1><p class="sub lead">Log in to continue to your dashboard.</p><div class="seg">'+[["rider","Rider","bike"],["fleet","Company","truck"]].map(function(k){return '<button class="'+(r===k[0]?"a":"")+'" onclick="S.lr=\''+k[0]+'\';R()">'+ic(k[2],18)+k[1]+'</button>'}).join("")+'</div>';
 if(!fm){if(!f)h+='<label class="sub" for="n">Full name</label><input id="n" placeholder="e.g. Tunde Ade" autocomplete="name">';h+='<label class="sub" for="p">Phone number</label><input id="p" type="tel" placeholder="08012345678" autocomplete="tel">'+(!f?'<h3 style="margin-top:14px">Payout account</h3><p class="sub">Where your delivery pay is sent.</p>'+bankForm():"")}
-else h+='<label class="sub" for="fs">Logistics company</label><select id="fs">'+S.fleets.filter(function(x){return x.key}).map(function(x){return '<option value="'+x.id+'">'+x.name+'</option>'}).join("")+'</select>';
-h+='<label class="sub" for="pin">'+(fm?"Company PIN":"4-digit PIN")+'</label><div class="pw"><input id="pin" type="password" inputmode="numeric" maxlength="'+(fm?12:4)+'" placeholder="Enter your PIN"><button type="button" class="eye" aria-label="Show or hide PIN" onclick="var i=document.getElementById(\'pin\');i.type=i.type===\'password\'?\'text\':\'password\'">'+ic("eye",20)+'</button></div><button class="btn grad" onclick="login()">'+(!fm&&!f?"Register as independent rider":"Log in")+'</button>';
+else h+='<label class="sub" for="em">Company email</label><input id="em" type="email" autocomplete="email" placeholder="dispatch@company.com">';
+h+='<label class="sub" for="pin">'+(fm?"Password":"6-digit PIN")+'</label><div class="pw"><input id="pin" type="password" '+(fm?'autocomplete="current-password"':'inputmode="numeric" maxlength="6"')+' placeholder="'+(fm?"Password":"6-digit PIN")+'"><button type="button" class="eye" aria-label="Show or hide PIN" onclick="var i=document.getElementById(\'pin\');i.type=i.type===\'password\'?\'text\':\'password\'">'+ic("eye",20)+'</button></div><button class="btn grad" onclick="login()">'+(!fm&&!f?"Register as independent rider":"Log in")+'</button>';
 if(!fm)h+='<button class="btn s" onclick="S.mode=\''+(f?"up":"in")+'\';R()">'+(f?"New rider? Register":"Have an account? Log in")+'</button>';
-h+='<div class="or">or</div><button class="btn g" onclick="toast(\'Google sign-in arrives with the Supabase backend\')">'+GOOGLE+'Continue with Google</button><div class="demo"><h3>'+ic("zap",18)+' Demo accounts, quick switch</h3><div class="dr"><div><b>Tunde Ade</b><div class="sub">08012345678 · Rider</div></div><button class="use" onclick="quick(\'r\')">'+ic("login",16)+'Use</button></div><div class="dr"><div><b>SwiftMove Logistics</b><div class="sub">Logistics company</div></div><button class="use" onclick="quick(\'f\')">'+ic("login",16)+'Use</button></div></div></div>';
+h+='</div>';
 a.innerHTML=h+(S.toast?'<div class="toast">'+S.toast+'</div>':"");return}
 if(S.role==="rider"){var rr=rd(S.me),n=feedOf(rr).length,ac=S.orders.filter(function(o){return o.rider===rr.id&&(o.st==="assigned"||o.st==="picked")}).length;T=[["home","home","Home",0],["feed","inbox","Requests",rr.on?n:0],["active","bike","Active",ac],["earn","wallet","Earnings",0],["me","user","Profile",0]];body=rview()}
-else{T=[["orders","list","Orders",0],["riders","users","Riders",0],["api","plug","API",0]];body='<div style="background:var(--pri);color:#fff;padding:14px 16px;font-weight:800">'+fl(S.me).name+'</div>'+fview()}
+else{T=[["orders","list","Orders",0],["riders","users","Riders",0],["api","user","Account",0]];body='<div style="background:var(--pri);color:#fff;padding:14px 16px;font-weight:800">'+fl(S.me).name+'</div>'+fview()}
 a.innerHTML=body+'<nav>'+T.map(function(t){return '<button class="'+(S.tab===t[0]?"a":"")+'" onclick="go(\''+t[0]+'\')"><i>'+ic(t[1])+'</i>'+t[2]+(t[3]?'<span class="bd">'+t[3]+'</span>':"")+'</button>'}).join("")+'</nav>'+(S.toast?'<div class="toast">'+S.toast+'</div>':"")}
-R();if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
+if(sb)boot();else{S.ready=true;R()}
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(function(){});
 </script></body></html>
