@@ -50,7 +50,7 @@ function bankForm(b){b=b||{};return '<label class="sub" for="bk">Bank</label><se
 function readBank(){var c=$("bk"),n=$("ba"),a=$("bn");if(!c||!/^\d{10}$/.test(n)||!a){toast("Choose your bank and enter a 10-digit account number and account name");return null}return{code:c,bank:BANKS.find(function(x){return x[0]===c})[1],no:n,name:a}}
 var CAT={food:{n:"Food & Supplements",src:"SmartyHub Organic"},med:{n:"Pharmacy",src:"HosiRx"},re:{n:"Real Estate",src:"MainTown Realty"}};
 var CMAP={food_supplement:"food",pharmacy:"med",document_parcel:"re"},CREV={food:"food_supplement",med:"pharmacy",re:"document_parcel"},SMAP={open:"open",claimed:"open",assigned:"assigned",picked_up:"picked",delivered:"delivered",cancelled:"cancelled"};
-var CFG=window.SHL||{},sb=window.supabase&&CFG.key&&CFG.key.indexOf("PASTE")<0?supabase.createClient(CFG.url,CFG.key):null,ZONES=[];
+var CFG=window.SHL||{},sb=window.supabase&&CFG.key&&CFG.key.indexOf("PASTE")<0?supabase.createClient(CFG.url,CFG.key,{auth:{storageKey:"shl-app-auth"}}):null,ZONES=[];
 var S={role:null,me:null,tab:"",lr:"rider",mode:"in",toast:"",skip:[],cred:null,ready:false,fleets:[],riders:[],orders:[],zones:[]};
 function mapD(d){return{id:d.id,ref:d.ref,cat:CMAP[d.category],zone:d.zone||"",from:(d.pickup_name?d.pickup_name+", ":"")+d.pickup_address,to:d.drop_address,fee:+d.fee||0,note:[d.note,d.cod_amount>0?"Collect "+N(d.cod_amount)+" cash":""].filter(Boolean).join(". "),pin:d.requires_code?"1":"",st:SMAP[d.status],fleet:d.fleet_id,rider:d.rider_id,dn:d.drop_name,dp:d.drop_phone,pp:d.pickup_phone}}
 function mail(p){return"234"+String(p).replace(/\D/g,"").slice(-10)+"@riders.smartyhub.app"}

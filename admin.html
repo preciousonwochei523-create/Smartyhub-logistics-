@@ -22,7 +22,7 @@ nav button{flex:1;padding:14px 2px;font-weight:700;color:var(--mut)}nav .a{color
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <script>
-var CFG=window.SHL||{},sb=window.supabase&&CFG.key&&CFG.key.indexOf("PASTE")<0?supabase.createClient(CFG.url,CFG.key):null;
+var CFG=window.SHL||{},sb=window.supabase&&CFG.key&&CFG.key.indexOf("PASTE")<0?supabase.createClient(CFG.url,CFG.key,{auth:{storageKey:"shl-admin-auth"}}):null;
 var CAT={food_supplement:"Food & Supplements",pharmacy:"Pharmacy",document_parcel:"Documents & Parcels"};
 var S={ok:false,tab:"orders",flt:"all",toast:"",d:[],f:[],r:[],b:[],ob:[]};
 function N(n){return "₦"+Math.round(+n||0).toLocaleString("en-NG")}
