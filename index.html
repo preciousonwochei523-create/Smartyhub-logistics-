@@ -24,7 +24,7 @@ h2{font-size:20px;margin:4px 0 12px}h3{font-size:16px}.sub{color:var(--mut);font
 .o{background:var(--card);border:1.5px solid var(--br);border-radius:18px;padding:14px;margin-bottom:12px}
 .fee{font-size:26px;font-weight:800}.tag{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--bg);color:var(--pri)}
 .rt{margin:12px 0;position:relative;padding-left:22px}.rt:before{content:"";position:absolute;left:5px;top:8px;bottom:8px;border-left:2px dotted var(--mut)}
-.rt div{position:relative;margin:7px 0}.rt div:before{content:"";position:absolute;left:-22px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--pri)}.rt div+div:before{border-radius:3px;background:var(--tx)}
+.rt div{position:relative;margin:7px 0}.rt div:before{content:"";position:absolute;left:-22px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--pri)}.rt div+div:before{border-radius:3px;background:var(--tx)}.rt.s-picked div:first-child:before{background:var(--ok)}.rt.s-picked div+div:before{background:var(--pri)}.rt.s-delivered div:before{background:var(--ok)}.rt.s-delivered:before{border-left-color:var(--ok)}
 .rt small{display:block;color:var(--mut);font-size:12px}
 .btn{display:block;width:100%;text-align:center;text-decoration:none;background:var(--pri);color:#fff;padding:14px;border-radius:14px;font-weight:700;margin-top:8px}
 .btn.s{background:var(--bg);color:var(--tx)}.btn.wa{background:#1fa855}.two{display:grid;grid-template-columns:1fr 2fr;gap:8px}.two .btn{margin-top:8px}
@@ -115,10 +115,10 @@ function togOnline(){var r=rd(S.me);r.on=!r.on;R();setPrefs()}
 function tz(k){tog(rd(S.me).zones,k);setPrefs()}function tc(k){tog(rd(S.me).cats,k);setPrefs()}
 async function saveBank(){var b=readBank();if(!b)return;var x=await sb.rpc("rider_set_bank",{p_code:b.code,p_bank:b.bank,p_number:b.no,p_name:b.name});if(E(x))return;await refresh(true);toast("Payout account saved")}
 function msg(o){return "New delivery "+o.ref+" ("+CAT[o.cat].n+")\nPickup: "+o.from+"\nDrop-off: "+o.to+"\nFee: "+N(o.fee)+"\n"+o.note+"\nOpen the app: "+location.href.split("#")[0]}
-function route(o){return '<div class="rt"><div><small>Pickup</small>'+o.from+'</div><div><small>Drop-off</small>'+o.to+'</div></div>'}
+function route(o){return '<div class="rt s-'+o.st+'"><div><small>Pickup</small>'+o.from+'</div><div><small>Drop-off</small>'+o.to+'</div></div>'}
 function head(o){return '<div class="row"><span class="fee">'+N(o.fee)+'</span><span class="tag">'+CAT[o.cat].n+'</span></div><div class="sub">'+o.ref+' · '+o.zone+'</div>'+route(o)}
 function ocard(o,m){var h='<div class="o">'+head(o);
-if(m!=="active")h+='<div class="sub">'+o.note+(o.pin?" Delivery code required.":"")+'</div>';
+if(m!=="active")h+='<div class="sub">'+o.note+(o.pin&&o.st!=="delivered"?" Delivery code required.":"")+'</div>';
 if(m==="accept")h+='<div class="two"><button class="btn s" onclick="skip(\''+o.id+'\')">Skip</button><button class="btn" onclick="accept(\''+o.id+'\')">Accept '+N(o.fee)+'</button></div>';
 if(m==="claim")h+='<button class="btn" onclick="claim(\''+o.id+'\')">Claim for fleet</button>';
 if(m==="active"){h+='<div class="steps"><i class="d"></i><i class="'+(o.st==="picked"?"d":"")+'"></i><i></i></div><div class="sub">'+(o.st==="assigned"?"Heading to pickup":"Picked up, on the way")+'</div>';
@@ -126,7 +126,7 @@ var ph=o.st==="assigned"?o.pp:o.dp;if(ph)h+='<a class="btn s" href="tel:'+ph+'">
 if(o.st==="picked"&&o.pin)h+='<input id="pin-'+o.id+'" inputmode="numeric" maxlength="4" placeholder="Customer’s 4-digit code">';
 h+='<button class="btn" onclick="adv(\''+o.id+'\')">'+(o.st==="assigned"?"Confirm pickup":"Mark delivered")+'</button><a class="btn s" target="_blank" rel="noopener" href="'+mp(o.st==="assigned"?o.from:o.to)+'">Navigate</a>'}
 if(m==="assign"){h+='<select id="as-'+o.id+'"><option value="">Choose rider…</option>'+S.riders.filter(function(r){return r.fleet===o.fleet}).map(function(r){return '<option value="'+r.id+'">'+r.name+(r.on?"":" (offline)")+'</option>'}).join("")+'</select><button class="btn" onclick="assign(\''+o.id+'\')">Assign in app</button>'+S.riders.filter(function(r){return r.fleet===o.fleet}).map(function(r){return ""}).join("")+'<button class="btn wa" onclick="shareSel(\''+o.id+'\')">Send via WhatsApp</button>'}
-if(m==="info")h+='<div class="sub">'+o.st.toUpperCase()+(o.rider?" · "+(rd(o.rider)||{name:"Rider"}).name:"")+'</div>';
+if(m==="info")h+='<div class="sub" style="'+(o.st==="delivered"?"color:var(--ok);font-weight:700":"")+'">'+o.st.toUpperCase()+(o.rider?" · "+(rd(o.rider)||{name:"Rider"}).name:"")+'</div>';
 return h+'</div>'}
 async function shareSel(id){var v=document.getElementById("as-"+id).value;if(!v)return toast("Pick a rider first");var o=od(id),x=await sb.rpc("assign_delivery",{p_id:id,p_rider:v});if(E(x))return;window.open(wa(rd(v).phone,msg(o)),"_blank");await refresh(true);R()}
 function list(a,m,e){return a.length?a.map(function(o){return ocard(o,m)}).join(""):'<div class="empty">'+e+'</div>'}
