@@ -53,6 +53,7 @@ var CMAP={food_supplement:"food",pharmacy:"med",document_parcel:"re"},CREV={food
 var CFG=window.SHL||{},sb=window.supabase&&CFG.key&&CFG.key.indexOf("PASTE")<0?supabase.createClient(CFG.url,CFG.key,{auth:{storageKey:"shl-app-auth"}}):null,ZONES=[];
 var S={role:null,me:null,tab:"",lr:"rider",mode:"in",toast:"",skip:[],cred:null,ready:false,fleets:[],riders:[],orders:[],zones:[]};
 function mapD(d){return{id:d.id,ref:d.ref,cat:CMAP[d.category],zone:d.zone||"",from:(d.pickup_name?d.pickup_name+", ":"")+d.pickup_address,to:d.drop_address,fee:+d.fee||0,note:[d.note,d.cod_amount>0?"Collect "+N(d.cod_amount)+" cash":""].filter(Boolean).join(". "),pin:d.requires_code?"1":"",st:SMAP[d.status],fleet:d.fleet_id,rider:d.rider_id,dn:d.drop_name,dp:d.drop_phone,pp:d.pickup_phone}}
+function mapO(d){return{id:d.delivery_id,ref:d.ref,cat:CMAP[d.category],zone:d.zone||"",from:(d.pickup_name?d.pickup_name+", ":"")+d.pickup_address,to:"Area: "+(d.zone||"")+" (full address after you accept)",fee:+d.fee||0,note:[d.note,d.cod_amount>0?"Collect "+N(d.cod_amount)+" cash":""].filter(Boolean).join(". "),pin:d.requires_code?"1":"",st:"open",fleet:d.fleet_id,rider:null,pp:d.pickup_phone}}
 function mail(p){return"234"+String(p).replace(/\D/g,"").slice(-10)+"@riders.smartyhub.app"}
 async function boot(){
  var ses=(await sb.auth.getSession()).data.session;
@@ -69,8 +70,8 @@ async function refresh(first){
  var old=S.orders.filter(function(o){return o.st==="open"&&!o.rider}).map(function(o){return o.id});
  var q=await Promise.all([sb.from("deliveries").select("*").order("created_at",{ascending:false}).limit(200),sb.from("riders").select("*"),sb.from("zones").select("name").order("name")]);
  if(q[0].error)return;
- S.orders=(q[0].data||[]).map(mapD);S.zones=(q[2].data||[]).map(function(z){return z.name});ZONES=S.zones;
- S.riders=(q[1].data||[]).map(function(r){return{id:r.id,uid:r.user_id,name:r.name,phone:r.phone,fleet:r.fleet_id,on:r.online,zones:r.zones||[],cats:(r.categories||[]).map(function(c){return CMAP[c]})}});
+ S.orders=(q[0].data||[]).map(mapD);if(S.role==="rider"){var oo=await sb.from("open_orders").select("*");S.orders=S.orders.concat((oo.data||[]).map(mapO))}S.zones=(q[2].data||[]).map(function(z){return z.name});ZONES=S.zones;
+ S.riders=(q[1].data||[]).map(function(r){return{id:r.id,uid:r.user_id,name:r.name,phone:r.phone,fleet:r.fleet_id,on:r.online,zones:r.zones||[],approved:r.approved!==false,cats:(r.categories||[]).map(function(c){return CMAP[c]})}});
  if(S.role==="rider"){var me=S.riders.find(function(r){return r.uid===s.user.id});S.me=me&&me.id;var b=(await sb.rpc("rider_my_bank")).data;if(me&&b&&b[0])me.bank={code:b[0].bank_code,bank:b[0].bank_name,no:b[0].account_number,name:b[0].account_name}}
  else S.me=S.fleets[0]&&S.fleets[0].id;
  if(first)return;
@@ -78,7 +79,7 @@ async function refresh(first){
  var ae=document.activeElement;if(ae&&/INPUT|SELECT|TEXTAREA/.test(ae.tagName))return;
  if(fresh&&S.role==="rider"&&rd(S.me)&&rd(S.me).on){if(navigator.vibrate)navigator.vibrate([200,100,200]);toast("New order request")}else R()}
 var ch=null;
-function listen(){if(ch)return;ch=sb.channel("d").on("postgres_changes",{event:"*",schema:"public",table:"deliveries"},function(){clearTimeout(window._t);window._t=setTimeout(function(){refresh()},400)}).subscribe();setInterval(function(){if(S.role)refresh()},20000)}
+function listen(){if(ch)return;var fire=function(){clearTimeout(window._t);window._t=setTimeout(function(){refresh()},400)};ch=sb.channel("d").on("postgres_changes",{event:"*",schema:"public",table:"deliveries"},fire).on("postgres_changes",{event:"*",schema:"public",table:"open_orders"},fire).subscribe();setInterval(function(){if(S.role)refresh()},20000)}
 function N(n){return "₦"+Math.round(n).toLocaleString("en-NG")}
 function fl(i){return S.fleets.find(function(f){return f.id===i})}function rd(i){return S.riders.find(function(r){return r.id===i})}function od(i){return S.orders.find(function(o){return o.id===i})}
 function $(i){return document.getElementById(i).value.trim()}
@@ -107,9 +108,12 @@ function claim(id){rpc("claim_delivery",{p_id:id},function(){toast("Claimed for 
 function assign(id){var v=document.getElementById("as-"+id).value;if(!v)return toast("Pick a rider");rpc("assign_delivery",{p_id:id,p_rider:v},function(){toast("Assigned to "+rd(v).name)})}
 function accept(id){rpc("accept_delivery",{p_id:id},function(){S.tab="active";toast("Order accepted")})}
 function skip(id){S.skip.push(id);R()}
-function adv(id){var o=od(id);if(o.st==="assigned")return rpc("advance_delivery",{p_id:id});
- var c=o.pin?$("pin-"+id):null;if(o.pin&&!c)return toast("Enter the customer's 4-digit code");
- rpc("advance_delivery",{p_id:id,p_code:c},function(){toast("Delivered. Your payment is on its way")})}
+async function adv(id){var o=od(id),a={p_id:id};
+ if(o.st==="picked"&&o.pin){var c=$("pin-"+id);if(!c)return toast("Enter the customer's 4-digit code");a.p_code=c}
+ var x=await sb.rpc("advance_delivery",a);if(E(x))return;
+ if(x.data==="wrong_code")return toast("Wrong code. Ask the customer to check their order page");
+ if(x.data==="locked")return toast("Too many wrong codes. This delivery is locked. Contact SmartyHub support");
+ await refresh(true);if(x.data==="delivered")toast("Delivered. Your payment is on its way");else R()}
 async function setPrefs(){var r=rd(S.me);E(await sb.rpc("rider_set_prefs",{p_online:r.on,p_zones:r.zones,p_cats:r.cats.map(function(c){return CREV[c]})}));await refresh(true);R()}
 function togOnline(){var r=rd(S.me);r.on=!r.on;R();setPrefs()}
 function tz(k){tog(rd(S.me).zones,k);setPrefs()}function tc(k){tog(rd(S.me).cats,k);setPrefs()}
@@ -148,6 +152,7 @@ return h}
 async function addR(){var n=$("rn"),p=$("rp");if(!n||!p)return toast("Enter name and phone");var x=await sb.functions.invoke("create-rider",{body:{name:n,phone:p}});if(x.error)return toast(await fnErr(x,"Could not create the account"));S.cred=x.data;await refresh(true);toast("Rider account created")}
 function R(){var a=document.getElementById("app"),h="",T,body;
 if(!S.ready){a.innerHTML='<div class="login"><p class="sub">Loading…</p></div>';return}
+if(S.role==="rider"&&rd(S.me)&&rd(S.me).approved===false){a.innerHTML='<div class="login"><h2>Waiting for approval</h2><p class="sub">Your account is registered. SmartyHub will approve it shortly. Log in again later.</p><button class="btn s" onclick="out()">Log out</button></div>';return}
 if(S.role==="rider"&&!rd(S.me)){a.innerHTML='<div class="login"><h2>Rider profile not found</h2><p class="sub">Ask your company to check your account.</p><button class="btn s" onclick="out()">Log out</button></div>';return}
 if(!S.role){var r=S.lr,f=S.mode==="in",fm=r==="fleet";
 h='<div class="login"><div class="brand"><img src="assets/hex-t.png" alt=""><div><b>SmartyHub Logistics</b><span class="sub">Deliver more, on your terms.</span></div></div><h1>Welcome back</h1><p class="sub lead">Log in to continue to your dashboard.</p><div class="seg">'+[["rider","Rider","bike"],["fleet","Company","truck"]].map(function(k){return '<button class="'+(r===k[0]?"a":"")+'" onclick="S.lr=\''+k[0]+'\';R()">'+ic(k[2],18)+k[1]+'</button>'}).join("")+'</div>';
